@@ -14,7 +14,7 @@ public class AuthClientTest {
     public void testAddCred() throws Exception {
         String userId = UUID.randomUUID().toString();
         String credentialId = UUID.randomUUID().toString();
-        AuthClient auth = new AuthClient("http://localhost:8080/uid-auth-backend");
+        AuthClient auth = new AuthClient("http://localhost:8081/uid-auth-backend");
         PasswordFactor password = new PasswordFactor("plaintext", credentialId);
         String salt = password.getSalt();
         List<Factor> factors = new ArrayList<>();
@@ -25,5 +25,7 @@ public class AuthClientTest {
         factors.clear();
         factors.add(password2);
         assertTrue(auth.authenticate(userId, factors));
+
+        assertTrue(auth.revokeCredential(userId, password2));
     }
 }

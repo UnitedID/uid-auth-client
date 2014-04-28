@@ -6,16 +6,21 @@ import org.unitedid.auth.client.impl.Factor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JSONPayLoad {
+public class JsonPayload {
     @Expose
     private String userId;
     @Expose
     private int version = 1;
     @Expose
-    List<Factor> factors = new ArrayList<Factor>();
+    List<Factor> factors = new ArrayList<>();
 
-    public JSONPayLoad(String userId) {
+    public JsonPayload(String userId) {
         this.userId = userId;
+    }
+
+    public JsonPayload(String userId, List<Factor> factors) {
+        this.userId = userId;
+        addFactors(factors);
     }
 
     public List<Factor> getFactors() {
@@ -24,5 +29,9 @@ public class JSONPayLoad {
 
     public void addFactor(Factor factor) {
         factors.add(factor);
+    }
+
+    public void addFactors(List<Factor> factors) {
+        this.factors.addAll(factors);
     }
 }

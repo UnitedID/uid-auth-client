@@ -26,28 +26,22 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AuthClient {
-    private String baseURL;
     private Client client;
     private WebTarget authenticationTarget;
     private WebTarget credentialTarget;
 
     public AuthClient(String baseURL) {
-        this.baseURL = baseURL;
         client = ClientBuilder.newClient();
         authenticationTarget = client.target(baseURL + "/authenticate/{userId}");
         credentialTarget = client.target(baseURL + "/credential/{userId}");
     }
 
     public Boolean authenticate(String userId, List<Factor> factors) {
-        JSONPayLoad payload = new JSONPayLoad(userId);
-
-        for (Factor factor : factors) {
-            payload.addFactor(factor);
-        }
-
+        JsonPayload payload = new JsonPayload(userId, factors);
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         Response res = authenticationTarget
                 .resolveTemplate("userId", userId)
@@ -61,18 +55,20 @@ public class AuthClient {
         return false;
     }
 
+    public Boolean authenticate(String userId, Factor factor) {
+        List<Factor> factors = new ArrayList<>();
+        factors.add(factor);
+
+        return authenticate(userId, factors);
+    }
+
     public Boolean addCredentials(String userId, List<Factor> factors) {
-        JSONPayLoad payLoad = new JSONPayLoad(userId);
-
-        for (Factor factor : factors) {
-            payLoad.addFactor(factor);
-        }
-
+        JsonPayload payload = new JsonPayload(userId, factors);
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         Response res = credentialTarget
                 .resolveTemplate("userId", userId)
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .post(Entity.entity("{\"addCreds\":" + gson.toJson(payLoad) + "}", MediaType.APPLICATION_JSON_TYPE));
+                .post(Entity.entity("{\"addCreds\":" + gson.toJson(payload) + "}", MediaType.APPLICATION_JSON_TYPE));
         AuthClientResponse authResponse = new Gson().fromJson(res.readEntity(String.class), AuthClientResponse.class);
 
         if (authResponse.getStatus() && authResponse.getAction().equals("addCred")) {
@@ -81,7 +77,37 @@ public class AuthClient {
         return false;
     }
 
+    public Boolean addCredential(String userId, Factor factor) {
+        List<Factor> factors = new ArrayList<>();
+        factors.add(factor);
+
+        return addCredentials(userId, factors);
+    }
+
     public Boolean revokeCredentials(String userId, List<Factor> factors) {
-        return false;
+        Boolean status = false;
+        for (Factor factor : factors) {
+            Response res = credentialTarget
+                    .queryParam("credentialId", factor.credentialId)
+                    .resolveTemplate("userId", userId)
+                    .request(MediaType.APPLICATION_JSON_TYPE).delete();
+            AuthClientResponse authResponse = new Gson()
+                    .fromJson(res.readEntity(String.class), AuthClientResponse.class);
+            if (authResponse.getStatus()) {
+                status = true;
+            } else {
+                status = false;
+                break;
+            }
+        }
+
+        return status;
+    }
+
+    public Boolean revokeCredential(String userId, Factor factor) {
+        List<Factor> factors = new ArrayList<>();
+        factors.add(factor);
+
+        return revokeCredentials(userId, factors);
     }
 }
