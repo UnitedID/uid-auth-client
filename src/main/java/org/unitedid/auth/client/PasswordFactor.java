@@ -20,21 +20,12 @@ public class PasswordFactor extends Factor {
 
     public PasswordFactor(String password, String credentialId)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        this.type = "password";
-        this.credentialId = credentialId;
-        salt = BCrypt.gensalt();
-        String bcryptHash = BCrypt.hashpw(sha256PreHash(password), salt);
-        passwordHash = bcryptHash.substring(salt.length());
+        this(password, credentialId, 10);
     }
 
     public PasswordFactor(String password, String credentialId, int rounds)
             throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        this.type = "password";
-        this.credentialId = credentialId;
-        salt = BCrypt.gensalt(rounds);
-        String bcryptHash = BCrypt.hashpw(sha256PreHash(password), salt);
-        System.out.println("Real hash:" + bcryptHash);
-        passwordHash = bcryptHash.substring(salt.length());
+        this(password, credentialId, BCrypt.gensalt(rounds));
     }
 
     public PasswordFactor(String password, String credentialId, String salt)
