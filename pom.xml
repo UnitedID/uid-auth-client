@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.unitedid.auth.client</groupId>
     <artifactId>uid-auth-client</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <inceptionYear>2014</inceptionYear>
     <organization>
         <name>United ID</name>
