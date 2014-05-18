@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.unitedid.auth.client;
+package org.unitedid.auth.client.factors;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.unitedid.auth.client.impl.Factor;
+import org.unitedid.auth.client.factors.impl.Factor;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

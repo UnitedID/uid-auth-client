@@ -17,7 +17,7 @@
 package org.unitedid.auth.client;
 
 import com.google.gson.annotations.Expose;
-import org.unitedid.auth.client.impl.Factor;
+import org.unitedid.auth.client.factors.impl.Factor;
 
 import java.util.ArrayList;
 import java.util.List;

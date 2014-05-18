@@ -18,7 +18,7 @@ package org.unitedid.auth.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.unitedid.auth.client.impl.Factor;
+import org.unitedid.auth.client.factors.impl.Factor;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -29,15 +29,16 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class AuthClient {
     private Client client;
     private WebTarget authenticationTarget;
     private WebTarget credentialTarget;
 
-    public AuthClient(String baseURL) {
-        client = ClientBuilder.newClient();
-        authenticationTarget = client.target(baseURL + "/authenticate/{userId}");
-        credentialTarget = client.target(baseURL + "/credential/{userId}");
+    public AuthClient(String baseURL, String username, String password) {
+        client = ClientBuilder.newClient().register(new ClientAuthenticator(username, password));
+        authenticationTarget = client.target(baseURL + "/api/authenticate/{userId}");
+        credentialTarget = client.target(baseURL + "/api/credential/{userId}");
     }
 
     public Boolean authenticate(String userId, List<Factor> factors) {
@@ -47,11 +48,14 @@ public class AuthClient {
                 .resolveTemplate("userId", userId)
                 .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.entity(
                         "{\"auth\":" + gson.toJson(payload) + "}", MediaType.APPLICATION_JSON_TYPE));
-        AuthClientResponse authResponse = new Gson().fromJson(res.readEntity(String.class), AuthClientResponse.class);
 
-        if (authResponse.getStatus() && authResponse.getAction().equals("auth")) {
-            return true;
+        if (res.getStatus() == 200) {
+            AuthClientResponse authResponse = new Gson().fromJson(res.readEntity(String.class), AuthClientResponse.class);
+            if (authResponse.getStatus() && authResponse.getAction().equals("auth")) {
+                return true;
+            }
         }
+
         return false;
     }
 
@@ -69,11 +73,14 @@ public class AuthClient {
                 .resolveTemplate("userId", userId)
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.entity("{\"addCreds\":" + gson.toJson(payload) + "}", MediaType.APPLICATION_JSON_TYPE));
-        AuthClientResponse authResponse = new Gson().fromJson(res.readEntity(String.class), AuthClientResponse.class);
 
-        if (authResponse.getStatus() && authResponse.getAction().equals("addCred")) {
-            return true;
+        if (res.getStatus() == 200) {
+            AuthClientResponse authResponse = new Gson().fromJson(res.readEntity(String.class), AuthClientResponse.class);
+            if (authResponse.getStatus() && authResponse.getAction().equals("addCred")) {
+                return true;
+            }
         }
+
         return false;
     }
 
@@ -91,6 +98,11 @@ public class AuthClient {
                     .queryParam("credentialId", factor.credentialId)
                     .resolveTemplate("userId", userId)
                     .request(MediaType.APPLICATION_JSON_TYPE).delete();
+            if (res.getStatus() != 200) {
+                status = false;
+                break;
+            }
+
             AuthClientResponse authResponse = new Gson()
                     .fromJson(res.readEntity(String.class), AuthClientResponse.class);
             if (authResponse.getStatus()) {

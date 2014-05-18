@@ -17,6 +17,7 @@
 package org.unitedid.auth.client;
 
 import org.testng.annotations.Test;
+import org.unitedid.auth.client.factors.PasswordFactor;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;

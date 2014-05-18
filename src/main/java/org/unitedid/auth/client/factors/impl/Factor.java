@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unitedid.auth.client.impl;
+package org.unitedid.auth.client.factors.impl;
 
 
 import com.google.gson.annotations.Expose;

@@ -17,7 +17,8 @@
 package org.unitedid.auth.client;
 
 import org.testng.annotations.Test;
-import org.unitedid.auth.client.impl.Factor;
+import org.unitedid.auth.client.factors.PasswordFactor;
+import org.unitedid.auth.client.factors.impl.Factor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class AuthClientTest {
     public void testAddCred() throws Exception {
         String userId = UUID.randomUUID().toString();
         String credentialId = UUID.randomUUID().toString();
-        AuthClient auth = new AuthClient("http://localhost:8081/uid-auth-backend");
+        AuthClient auth = new AuthClient("http://localhost:8081/uid-auth-backend", "admin", "password");
         PasswordFactor password = new PasswordFactor("plaintext", credentialId);
         String salt = password.getSalt();
         List<Factor> factors = new ArrayList<>();
@@ -43,5 +44,22 @@ public class AuthClientTest {
         assertTrue(auth.authenticate(userId, factors));
 
         assertTrue(auth.revokeCredential(userId, password2));
+    }
+
+    @Test
+    public void testAddOathCred() throws Exception {
+        /*String userId = UUID.randomUUID().toString();
+        String seed = "3132333435363738393031323334353637383930";
+        String credentialId = UUID.randomUUID().toString();
+        AuthClient auth = new AuthClient("http://localhost:8081/uid-auth-backend");
+        OATHFactor oathHOTP = new OATHFactor("oathhotp", 8192, seed, "755224", credentialId);
+        String nonce = oathHOTP.getNonce();
+        assertTrue(auth.addCredential(userId, oathHOTP));
+
+        OATHFactor oathValidate = new OATHFactor("oathhotp", nonce, "969429", credentialId);
+        assertTrue(auth.authenticate(userId, oathValidate));
+
+        OATHFactor oathFail = new OATHFactor("oathhotp", nonce, "111111", credentialId);
+        assertFalse(auth.authenticate(userId, oathFail));*/
     }
 }

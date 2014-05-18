@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.unitedid.auth.client;
+package org.unitedid.auth.client.factors;
 
 import com.google.gson.annotations.Expose;
-import org.unitedid.auth.client.impl.Factor;
+import org.unitedid.auth.client.factors.impl.Factor;
 
 public class OATHFactor extends Factor {
     @Expose
